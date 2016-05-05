@@ -3,10 +3,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.7.+'
+        classpath 'com.android.tools.build:gradle:2.1.0'
     }
 }
-apply plugin: 'android'
+
+apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
@@ -15,14 +16,25 @@ repositories {
 dependencies {
     compile 'com.android.support:support-v4:19.0.1'
     compile 'com.android.support:appcompat-v7:19.0.1'
+    compile 'com.android.support:multidex:1.0.0'
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.0.1"
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 16
+        targetSdkVersion 21
+
+        multiDexEnabled true
+
+        dexOptions {
+            preDexLibraries = false
+        }
+    }
+    dependencies {
+
+        compile 'com.android.support:multidex:1.0.0'
     }
 }
