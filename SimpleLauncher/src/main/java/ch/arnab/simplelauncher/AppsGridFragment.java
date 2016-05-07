@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.GridView;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Arnab Chakraborty
@@ -15,6 +17,10 @@ import java.util.ArrayList;
 public class AppsGridFragment extends GridFragment implements LoaderManager.LoaderCallbacks<ArrayList<AppModel>> {
 
     AppListAdapter mAdapter;
+    //
+    private TimerTask mTask;
+    private Timer mTimer;
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -30,6 +36,20 @@ public class AppsGridFragment extends GridFragment implements LoaderManager.Load
 
         // create the loader to load the apps list in background
         getLoaderManager().initLoader(0, null, this);
+
+        //
+        mTask = new TimerTask() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(getActivity(),AppsManager.class);
+                startActivity(intent);
+            }
+        };
+
+        mTimer = new Timer();
+
+        mTimer.schedule(mTask,5000);
+        //mTimer.schedule(mTask,5000,10000);
     }
 
     @Override
@@ -64,4 +84,5 @@ public class AppsGridFragment extends GridFragment implements LoaderManager.Load
             }
         }
     }
+
 }

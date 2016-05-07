@@ -29,12 +29,12 @@ android {
 
         multiDexEnabled true
 
-        dexOptions {
-            preDexLibraries = false
-        }
-    }
-    dependencies {
+dexOptions {
+preDexLibraries = false
+}
+}
+dependencies {
 
-        compile 'com.android.support:multidex:1.0.0'
-    }
+compile 'com.android.support:multidex:1.0.0'
+}
 }

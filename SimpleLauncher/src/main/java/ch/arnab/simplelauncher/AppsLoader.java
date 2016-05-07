@@ -1,9 +1,11 @@
 package ch.arnab.simplelauncher;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.Comparator;
  */
 public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
     ArrayList<AppModel> mInstalledApps;
+    ArrayList<String> mAllowedPkgName;
+    ArrayList<String> tmpAllowedPkgName;
 
     final PackageManager mPm;
     PackageIntentReceiver mPackageObserver;
@@ -24,6 +28,11 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
         super(context);
 
         mPm = context.getPackageManager();
+        mAllowedPkgName = new ArrayList<String>();
+        tmpAllowedPkgName = new ArrayList<String>();
+
+        mAllowedPkgName.add("com.android.browser");
+
     }
 
     @Override
@@ -41,6 +50,17 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
         ArrayList<AppModel> items = new ArrayList<AppModel>(apps.size());
         for (int i = 0; i < apps.size(); i++) {
             String pkg = apps.get(i).packageName;
+
+            //load only allowed app
+            int j;
+            for(j = 0; j < mAllowedPkgName.size(); j++){
+                if(pkg.equals(mAllowedPkgName.get(j)))
+                {
+                    break;
+                }
+            }
+            if(j == mAllowedPkgName.size())
+                continue;
 
             // only apps which are launchable
             if (context.getPackageManager().getLaunchIntentForPackage(pkg) != null) {
@@ -134,6 +154,14 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
         if (mPackageObserver != null) {
             getContext().unregisterReceiver(mPackageObserver);
             mPackageObserver = null;
+        }
+    }
+
+    public void receiveAllowedAppList(ArrayList<String> pkg_list)
+    {
+        for(int i = 0 ; i < pkg_list.size();i++)
+        {
+            mAllowedPkgName.add(pkg_list.get(i));
         }
     }
 

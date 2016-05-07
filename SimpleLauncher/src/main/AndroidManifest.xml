@@ -14,7 +14,9 @@
         android:stateNotNeeded="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="android.support.multidex.MultiDexApplication">
+
         <activity
             android:name="ch.arnab.simplelauncher.HomeScreen"
             android:label="@string/app_name"
@@ -23,12 +25,15 @@
             android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <!-- The following two intent-filters are the key to set homescreen -->
+                <!-- automatically start this LAUNCHER -->
                 <category android:name="android.intent.category.LAUNCHER" />
+                <!-- The following two intent-filters are the key to set homescreen -->
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
 
             </intent-filter>
         </activity>
+        <activity android:name=".AppsManager"></activity>
+        <activity android:name=".AppsManagerResult"></activity>
     </application>
 </manifest>

@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
+
+import java.util.ArrayList;
 
 /**
  * Helper class to look for interesting changes to the installed apps
@@ -29,10 +32,17 @@ public class PackageIntentReceiver extends BroadcastReceiver {
         sdFilter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE);
         sdFilter.addAction(Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE);
         mLoader.getContext().registerReceiver(this, sdFilter);
+
+        IntentFilter myFilter = new IntentFilter();
+        myFilter.addAction("ch.arnab.simplelauncher.SEND_BROAD_CAST");
+        mLoader.getContext().registerReceiver(this, myFilter);
+
     }
 
     @Override public void onReceive(Context context, Intent intent) {
         // Tell the loader about the change.
+        ArrayList<String> newAllowedPkg = intent.getStringArrayListExtra("pkgName_list");
+        mLoader.receiveAllowedAppList(newAllowedPkg);
         mLoader.onContentChanged();
     }
 
