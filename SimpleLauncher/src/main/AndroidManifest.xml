@@ -34,6 +34,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".AppsManager"></activity>
-        <activity android:name=".AppsManagerResult"></activity>
+        <activity android:name=".HY_StateDisplay"></activity>
     </application>
 </manifest>

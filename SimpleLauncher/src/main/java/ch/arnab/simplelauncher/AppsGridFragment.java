@@ -38,7 +38,17 @@ public class AppsGridFragment extends GridFragment implements LoaderManager.Load
         getLoaderManager().initLoader(0, null, this);
 
         //
-        mTask = new TimerTask() {
+/*        mTask = new TimerTask() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(getActivity(),HY_StateDisplay.class);
+                startActivity(intent);
+            }
+        };
+
+        mTimer = new Timer();
+        mTimer.schedule(mTask,1000);*/
+/*        mTask = new TimerTask() {
             @Override
             public void run() {
                 Intent intent = new Intent(getActivity(),AppsManager.class);
@@ -48,7 +58,7 @@ public class AppsGridFragment extends GridFragment implements LoaderManager.Load
 
         mTimer = new Timer();
 
-        mTimer.schedule(mTask,5000);
+        mTimer.schedule(mTask,5000);*/
         //mTimer.schedule(mTask,5000,10000);
     }
 

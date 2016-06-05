@@ -203,6 +203,7 @@ public class GridFragment extends Fragment {
         final boolean hadAdapter = (mAdapter != null);
         mAdapter = adapter;
         if (mGrid != null) {
+
             mGrid.setAdapter(adapter);
             if (!mGridShown && !hadAdapter) {
                 // The grid was hidden, and previously didn't have an
