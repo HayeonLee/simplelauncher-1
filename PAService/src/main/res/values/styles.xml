@@ -1,0 +1,83 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+</resources>
+
+<!--<resources>
+
+
+    &lt;!&ndash; Base application theme. &ndash;&gt;
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorAccent">#FF4081</item>
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="colorPrimaryDark">#303F9F</item>
+        <item name="colorControlHighlight">#00CC55</item>
+        <item name="colorControlNormal">#FF0000</item>
+    </style>
+
+</resources>-->
+
+<!--<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorAccent">#303F9F1</item>
+        <item name="colorPrimary">#3F51B5</item>
+        <item name="colorPrimaryDark">#303F9F</item>
+        <item name="android:navigationBarColor">#303F9F</item>
+        <item name="colorControlHighlight">#00CC55</item>
+        <item name="colorControlNormal">#FF0000</item>
+    </style>
+</resources>-->
+<!--<resources>
+
+    &lt;!&ndash;
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    &ndash;&gt;
+    <style name="AppBaseTheme" parent="android:Theme.Wallpaper.NoTitleBar">
+        &lt;!&ndash;
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        &ndash;&gt;
+    </style>
+
+    &lt;!&ndash; Application theme. &ndash;&gt;
+    <style name="AppTheme" parent="AppBaseTheme">
+        &lt;!&ndash; All customizations that are NOT specific to a particular API-level can go here. &ndash;&gt;
+    </style>
+
+</resources>-->
+<!--<resources>
+
+    &lt;!&ndash; your theme inherits from the material theme &ndash;&gt;
+    <style name="AppTheme" parent="android:Theme.Material">
+        &lt;!&ndash; theme customizations &ndash;&gt;
+    </style>
+</resources>-->
+<!--<resources>
+    &lt;!&ndash; inherit from the material theme &ndash;&gt;
+    <style name="AppTheme" parent="android:Theme.Material">
+        &lt;!&ndash; Main theme colors &ndash;&gt;
+        &lt;!&ndash;   your app branding color for the app bar &ndash;&gt;
+        <item name="android:colorPrimary">@color/primary</item>
+        &lt;!&ndash;   darker variant for the status bar and contextual app bars &ndash;&gt;
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        &lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
+</resources>-->

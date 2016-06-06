@@ -1,0 +1,32 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/color_accent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+</resources>
+<!--
+<resources>
+    &lt;!&ndash; inherit from the material theme &ndash;&gt;
+    <style name="AppTheme" parent="android:Theme.Material">
+        &lt;!&ndash; Main theme colors &ndash;&gt;
+        &lt;!&ndash;   your app branding color for the app bar &ndash;&gt;
+        <item name="android:colorPrimary">#3F51B5</item>
+        &lt;!&ndash;   darker variant for the status bar and contextual app bars &ndash;&gt;
+        <item name="android:colorPrimaryDark">#303F9F</item>
+        &lt;!&ndash;   theme UI controls like checkboxes and text fields &ndash;&gt;
+        <item name="android:colorAccent">#FF4081</item>
+        <item name="android:navigationBarColor">#303F9F</item>
+
+    </style>
+</resources>-->
