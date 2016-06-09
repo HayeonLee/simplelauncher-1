@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:padding="16dp"
+    android:paddingBottom="40dp"
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@color/color_primary_dark"
+        android:text="[CS442] Final Project :\nSUNSHINE\n(Service for yoU to eNhance Self-management Helpfully and Intelligently from Now to forEver)
+        \n\n\n\nImplemented by [T0303] \n\nInSu Jang (20165535) \n\nBoHun Seo (20163320) \n\nHaYeon Lee (20163502)"
+        android:id="@+id/dv"/>
+
+<!--    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:id="@+id/dv2"
+        android:text="Implemented by [T0303] \n\n InSu Jang (20165535) \n\n BoHun Seo (20163320) \n\n HaYeon Lee (20163502)"/>-->
+</LinearLayout>

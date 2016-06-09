@@ -3,14 +3,12 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="100dp"
-	android:elevation="4dp"
 	android:background="@color/color_primary_dark">
-
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_centerInParent="true"
-		android:text="PAService"
+		android:text="Sunshine Launcher"
 		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:textColor="@android:color/white"/>
 </RelativeLayout>

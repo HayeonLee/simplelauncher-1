@@ -12,6 +12,7 @@
 	<!-- As the main content view, the view below consumes the entire
          space available using match_parent in both dimensions. -->
 	<RelativeLayout
+		android:id="@+id/main_re"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
@@ -39,4 +40,26 @@
 		app:headerLayout="@layout/drawer_header"
 		app:menu="@menu/home_screen"/>
 
+<!--	<android.support.design.widget.CoordinatorLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    <android.support.design.widget.FloatingActionButton
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:clickable="true"
+        android:layout_gravity="end|bottom"
+        android:id="@+id/fab"
+		app:elevation="4dp"
+		app:borderWidth="4dp"
+		/>
+    </android.support.design.widget.CoordinatorLayout>-->
+<!--
+	android:src="@drawable/ic_arrow_forward_white_48dp"
+-->
+
+	<!--
+        android:background="@drawable/fab"
+    -->
 </android.support.v4.widget.DrawerLayout>

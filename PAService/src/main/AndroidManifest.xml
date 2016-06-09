@@ -13,13 +13,13 @@
         android:clearTaskOnLaunch="true"
         android:stateNotNeeded="true"
         android:icon="@drawable/ic_launcher"
-        android:label="PAService"
+        android:label="Sunchine Launcher"
         android:theme="@style/AppTheme"
         android:name="android.support.multidex.MultiDexApplication">
 
         <activity
             android:name="ch.arnab.simplelauncher.HomeScreen"
-            android:label="PAService"
+            android:label="Sunshine Launcher"
             android:theme="@style/AppTheme.NoActionBar"
             android:launchMode="singleTask"
             android:excludeFromRecents="true"
@@ -35,7 +35,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".AppsManager"></activity>
-        <activity android:name=".HY_StateDisplay"></activity>
 
     </application>
 </manifest>

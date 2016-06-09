@@ -27,8 +27,7 @@ import java.util.Comparator;
 
 
 public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
-    ArrayList<AppModel>
-            mInstalledApps;
+    ArrayList<AppModel> mInstalledApps;
     List<String> mNotAllowedPkgName;
     ArrayList<String> BlackList = null;
 

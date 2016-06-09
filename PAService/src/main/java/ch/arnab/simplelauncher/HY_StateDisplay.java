@@ -10,13 +10,17 @@ import android.os.Handler;
 import android.os.PAService;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -58,6 +62,10 @@ public class HY_StateDisplay extends Fragment {
     private static final String ACTION_PASERVICE_POINTTIME_TICKTING = "PA_SERVICE_POINTTIME_TICKING";
     private static final String ACTION_PASERVICE_DEACTIVATED ="PA_SERVICE_DEACTIVATED";
 
+    FloatingActionButton fab;
+    DrawerLayout mylayout;
+    View v2;
+
 
     BroadcastReceiver bc = new BroadcastReceiver() {
         @Override
@@ -75,7 +83,12 @@ public class HY_StateDisplay extends Fragment {
                     });
                     if(point>10)
                     {
-                        mUnlockBtn.setVisibility(View.VISIBLE);
+                        mUnlockBtn.setBackgroundResource(R.drawable.ic_lock_open_black_48dp);
+                        //mUnlockBtn.setVisibility(View.VISIBLE);
+                    }else
+                    {
+                        mUnlockBtn.setBackgroundResource(R.drawable.ic_lock_black_48dp);
+
                     }
                 }
             } else if (action.equals(ACTION_PASERVICE_POINTTIME_TICKTING)) {
@@ -110,9 +123,9 @@ public class HY_StateDisplay extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.state_display, container, false);
-
+        LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        v2 = layoutInflater.inflate(R.layout.activity_main,null);
         remainTimePb = (ProgressBar) v.findViewById(R.id.pb);
-        remainTimePb.setMax((int)pInterval);
 
         IntentFilter inf = new IntentFilter();
         inf.addAction(ACTION_PASERVICE_DEACTIVATED);
@@ -129,6 +142,7 @@ public class HY_StateDisplay extends Fragment {
                 culTime = LT[1];
                 pa.setRequiredPointForExecuting(3,1);
                 pa.initPointTimer(pInterval,perPoint);
+                //changeBackground(LEVEL);
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -155,22 +169,32 @@ public class HY_StateDisplay extends Fragment {
                             LEVEL++;
                             mPointView.setText(Long.toString(point));
                             mLevelView.setText(Long.toString(LEVEL));
+
+                            //LEVEL에 대한 함수...
+                            //changeBackground(LEVEL);
                         }
                     }catch (RemoteException e) {
                     }
             }
         });
         mUnlockBtn = (Button) v.findViewById(R.id.UnlockBtn);
-        mUnlockBtn.setVisibility(View.INVISIBLE);
+        //mUnlockBtn.setVisibility(View.INVISIBLE);
             mUnlockBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(getActivity(), AppsManager.class);
-                    startActivity(intent);
+                    if(point > 10)
+                    {
+                        Intent intent = new Intent(getActivity(), AppsManager.class);
+                        startActivity(intent);
+                    }
                 }
             });
 
         mProfile = (ImageView) v.findViewById(R.id.iv1);
+        remainTimePb.setMax((int)pInterval);
+
+        mylayout = (DrawerLayout) v2.findViewById(R.id.drawer_layout);
+
         return v;
     }
 
@@ -185,4 +209,35 @@ public class HY_StateDisplay extends Fragment {
     public void onResume() {
         super.onResume();
     }
+
+    public void changeBackground(long LEVEL)
+    {
+
+        int c = (int)LEVEL%8;
+        switch (c)
+        {
+            case 0 :
+                mylayout.setBackgroundResource(R.drawable.a);
+                break;
+            case 1:
+                mylayout.setBackgroundResource(R.drawable.b);
+                break;
+            case 2:
+                mylayout.setBackgroundResource(R.drawable.c);
+                break;
+            case 3:
+                mylayout.setBackgroundResource(R.drawable.d);
+                break;
+            case 4:
+                mylayout.setBackgroundResource(R.drawable.e);
+                break;
+            case 5:
+                mylayout.setBackgroundResource(R.drawable.f);
+                break;
+            default:
+                mylayout.setBackgroundResource(R.drawable.g);
+                break;
+        }
+    }
+
 }

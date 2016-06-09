@@ -16,6 +16,8 @@ import java.util.TimerTask;
  */
 public class AppsGridFragment extends GridFragment implements LoaderManager.LoaderCallbacks<ArrayList<AppModel>> {
 
+
+
     AppListAdapter mAdapter;
     //
     private TimerTask mTask;
@@ -37,29 +39,6 @@ public class AppsGridFragment extends GridFragment implements LoaderManager.Load
         // create the loader to load the apps list in background
         getLoaderManager().initLoader(0, null, this);
 
-        //
-/*        mTask = new TimerTask() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(getActivity(),HY_StateDisplay.class);
-                startActivity(intent);
-            }
-        };
-
-        mTimer = new Timer();
-        mTimer.schedule(mTask,1000);*/
-/*        mTask = new TimerTask() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(getActivity(),AppsManager.class);
-                startActivity(intent);
-            }
-        };
-
-        mTimer = new Timer();
-
-        mTimer.schedule(mTask,5000);*/
-        //mTimer.schedule(mTask,5000,10000);
     }
 
     @Override
