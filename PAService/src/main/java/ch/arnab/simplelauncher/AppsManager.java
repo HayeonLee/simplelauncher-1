@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.os.PAService;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,56 +32,94 @@ public class AppsManager extends Activity {
 
     Activity act = this;
     GridView gridView;
-    private List<ResolveInfo> apps;
+    private List<ResolveInfo> apps = new ArrayList<ResolveInfo>();
     private PackageManager pm;
-    ArrayList<String> pkgName;
-
-    private int point;
-    private String timeStr;
-    private String remainTimeStr;
-
     //for stop time
-    private long restartTime;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN,null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
-        Intent reIntent = getIntent();
-        point = reIntent.getIntExtra("point",0);
-        timeStr = reIntent.getStringExtra("timeStr");
-        remainTimeStr = reIntent.getStringExtra("reTimeStr");
         pm = getPackageManager();
-        apps = pm.queryIntentActivities(mainIntent,0);
-        pkgName = new ArrayList<String>();
+        List<ResolveInfo> tapps = pm.queryIntentActivities(mainIntent,0);
 
-        restartTime = 0;
+        try
+        {
+            PAService pa = PAService.Stub.asInterface(ServiceManager.getService("PAService"));
+            List<String> blockedList;
+            if(pa != null)
+            {
+                blockedList = pa.getBlockedPackageList();
+
+                for(ResolveInfo a : tapps)
+                {
+                    for(String p : blockedList)
+                    {
+                        try {
+                            if (a.activityInfo.packageName.equals(p)) {
+                                apps.add(a);
+                            }
+                        }catch(NullPointerException e)
+                        {
+                            Log.e("PAService","From launcher : blockedAppList NPE");
+                        }
+                    }
+                }
+            }
+
+        }catch(RemoteException e)
+        {
+
+        }
+
+        //pkgName = new ArrayList<String>();
 
         setContentView(R.layout.activity_manager);
 
         gridView = (GridView) findViewById(R.id.gridView1);
         gridView.setAdapter(new gridAdapter());
 
-        Button button = (Button)findViewById(R.id.Button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //receive new package list and reload launcher display with AppsLoader
-                Intent sendIntent = new Intent("ch.arnab.simplelauncher.SEND_BROAD_CAST");
-                sendIntent.putStringArrayListExtra("pkgName_list",pkgName);
-                sendBroadcast(sendIntent);
-                Intent data = new Intent();
-                data.putExtra("afterPoint",point);
+        try
+        {
+           PAService pa = PAService.Stub.asInterface(ServiceManager.getService("PAService"));
 
-                restartTime = System.currentTimeMillis();
-                data.putExtra("restartTime",restartTime);
-                setResult(0,data);
-                finish();
+            if(pa != null)
+            {
+                pa.enableTempExecutePermission();
+                //pa.initPointTimer(1200,20);
+            }else
+            {
+                throw new UnsupportedOperationException();
             }
 
-        });
+        }catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try
+        {
+            PAService pa = PAService.Stub.asInterface(ServiceManager.getService("PAService"));
+
+            if(pa != null)
+            {
+                pa.disableTempExecutePermission();
+                //pa.initPointTimer(1200,20);
+            }else
+            {
+                throw new UnsupportedOperationException();
+            }
+
+        }catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     public class gridAdapter extends BaseAdapter {
@@ -106,38 +147,19 @@ public class AppsManager extends Activity {
             }
 
             final ResolveInfo info = apps.get(position);
-
             ImageView imageView = (ImageView) convertView.findViewById(R.id.imageView1);
             TextView textView = (TextView) convertView.findViewById(R.id.textView1);
             imageView.setImageDrawable(info.activityInfo.loadIcon(getPackageManager()));
             textView.setText(info.activityInfo.loadLabel(pm).toString());
-            CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkbox1);
 
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                String msg = info.activityInfo.packageName.toString();
+            imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (compoundButton.getId() == R.id.checkbox1) {
-                        if (isChecked) {
+                public void onClick(View view) {
+                        Intent intent = getPackageManager().getLaunchIntentForPackage(info.activityInfo.packageName);
 
-                            if (point > 20) {
-                                point -= 20;
-                                pkgName.add(msg);
-                                int num = point/20;
-                                Toast.makeText(act, "You can check "+num+" more apps", Toast.LENGTH_SHORT).show();
-                            }else
-                            {
-                                Toast.makeText(act, "You need more points", Toast.LENGTH_SHORT).show();
-                            }
-                        }else if(!isChecked)
-                        {
-                            point +=20;
-                            pkgName.remove(msg);
-                            int num = point/20;
-                            Toast.makeText(act, "You can check "+num+"more apps", Toast.LENGTH_SHORT).show();
+                        if (intent != null) {
+                            startActivity(intent);
                         }
-                    }
                 }
             });
 

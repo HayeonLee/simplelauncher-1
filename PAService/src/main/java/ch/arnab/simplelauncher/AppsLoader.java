@@ -1,14 +1,22 @@
 package ch.arnab.simplelauncher;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.PAService;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
+import android.view.View;
 
 import java.text.Collator;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Collections;
 import java.util.List;
 import java.util.Comparator;
@@ -16,10 +24,12 @@ import java.util.Comparator;
 /**
  * @credit http://developer.android.com/reference/android/content/AsyncTaskLoader.html
  */
+
+
 public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
     ArrayList<AppModel> mInstalledApps;
-    ArrayList<String> mAllowedPkgName;
-    ArrayList<String> tmpAllowedPkgName;
+    List<String> mNotAllowedPkgName;
+    ArrayList<String> BlackList = null;
 
     final PackageManager mPm;
     PackageIntentReceiver mPackageObserver;
@@ -28,17 +38,31 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
         super(context);
 
         mPm = context.getPackageManager();
-        mAllowedPkgName = new ArrayList<String>();
-        tmpAllowedPkgName = new ArrayList<String>();
+        //mNotAllowedPkgName = new List<String>();
 
-        mAllowedPkgName.add("com.android.browser");
+        //mNotAllowedPkgName.add("com.android.browser");
 
     }
 
+
     @Override
     public ArrayList<AppModel> loadInBackground() {
-        // retrieve the list of installed applications
+        // retrieve the ArrayList of installed applications
         List<ApplicationInfo> apps = mPm.getInstalledApplications(0);
+
+        try{
+
+            PAService pa = PAService.Stub.asInterface(ServiceManager.getService("PAService"));
+            if(pa!=null)
+            {
+                mNotAllowedPkgName = pa.getBlockedPackageList();
+                BlackList = new ArrayList<String>(mNotAllowedPkgName);
+
+            }
+        }catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
 
         if (apps == null) {
             apps = new ArrayList<ApplicationInfo>();
@@ -53,13 +77,13 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
 
             //load only allowed app
             int j;
-            for(j = 0; j < mAllowedPkgName.size(); j++){
-                if(pkg.equals(mAllowedPkgName.get(j)))
+            for(j = 0; j < BlackList.size(); j++){
+                if(pkg.equals(BlackList.get(j)))
                 {
                     break;
                 }
             }
-            if(j == mAllowedPkgName.size())
+            if(j != BlackList.size())
                 continue;
 
             // only apps which are launchable
@@ -157,11 +181,11 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
         }
     }
 
-    public void receiveAllowedAppList(ArrayList<String> pkg_list)
+    public void receiveNotAllowedAppList(ArrayList<String> pkg_list)
     {
         for(int i = 0 ; i < pkg_list.size();i++)
         {
-            mAllowedPkgName.add(pkg_list.get(i));
+            BlackList.add(pkg_list.get(i));
         }
     }
 

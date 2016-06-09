@@ -1,9 +1,15 @@
 package ch.arnab.simplelauncher;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PAService;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +21,6 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by hayeonlee on 16. 6. 4.
@@ -24,395 +28,161 @@ import java.util.TimerTask;
 public class HY_StateDisplay extends Fragment {
 
     TextView mCulStuTimeView;
-    private Timer mTimer;
-    private int culmulTime;
-    private long curTime;
-    private long startTime;
-    String timeStr;
+    private long time;
+    private long culTime;
+
     //remain time
     TextView mRemainTimeView;
-    private int remainMin;
-    private int remainSec;
-    String remainTimeStr;
-
     //point
     TextView mPointView;
-    private int point;
+    private long point;
     boolean flag;
     //level
     TextView mLevelView;
     Button mLevelBtn;
-    private int LEVEL;
+    private long LEVEL;
     //unlock
     Button mUnlockBtn;
-
-    //stop time
-    private long stopTime;
-    private long restartTime;
-    private long pauseTime;
 
     ImageView mProfile;
 
     ProgressBar remainTimePb;
     Handler handler;
+    long pInterval = 10;
+    long perPoint = 10;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
-        View v = inflater.inflate(R.layout.state_display,container,false);
-        //setContentView(R.layout.state_display);
+    private String rt ="";
+    private String ct ="";
 
-/*        if(savedInstanceState!=null)
-        {
-            point = savedInstanceState.getInt("point",0);
-            LEVEL = savedInstanceState.getInt("LEVEL",1);
-            pauseTime = savedInstanceState.getLong("pauseTime");
-        }else
-        {*/
-            point = 100;
-            LEVEL = 1;
-            pauseTime = 0;
-       // }
-        mCulStuTimeView = (TextView) v.findViewById(R.id.CulStuTimeView);
-        MainTimerTask timerTask = new MainTimerTask();
-        culmulTime = 0;
-        curTime = 0;
-        startTime = System.currentTimeMillis() + 1000;
-        mTimer = new Timer();
-        mTimer.schedule(timerTask, 100, 1000);
+    private static final String ACTION_PASERVICE_POINT_CHANGED = "PA_SERVICE_POINT_CHANGED";
+    private static final String ACTION_PASERVICE_POINTTIME_TICKTING = "PA_SERVICE_POINTTIME_TICKING";
+    private static final String ACTION_PASERVICE_DEACTIVATED ="PA_SERVICE_DEACTIVATED";
 
-        //remain time setting
-        mRemainTimeView = (TextView) v.findViewById(R.id.RemaTimeView);
-        remainMin = 20;
-        remainSec = 0;
 
-        //
-        //point = 100;
-        //LEVEL = 1;
-        stopTime = 0;
-        restartTime = 0;
-        //pauseTime = 0;
-
-        flag = true;
-        mPointView = (TextView) v.findViewById(R.id.PointView);
-        mLevelView = (TextView) v.findViewById(R.id.LevelView);
-        mLevelView.setText(Integer.toString(LEVEL));
-        //
-        mLevelBtn = (Button)v.findViewById(R.id.LevelBtn);
-        //mLevelBtn.setVisibility(View.INVISIBLE);
-        mLevelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(point>=20)
-                {
-                    point-=20;
-                    LEVEL++;
-                    mPointView.setText(Integer.toString(point));
-                    mLevelView.setText(Integer.toString(LEVEL));
-                }
-            }
-        });
-        mUnlockBtn = (Button)v.findViewById(R.id.UnlockBtn);
-        //mUnlockBtn.setVisibility(View.INVISIBLE);
-        mUnlockBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(point>=20) {
-                    //point -= 20;
-                    mPointView.setText(Integer.toString(point));
-                    Intent intent = new Intent(getActivity(), AppsManager.class);
-                    intent.putExtra("point",point);
-                    stopTime = curTime;
-                    startActivityForResult(intent,0);
-                    //finish();
-                }
-            }
-        });
-
-        mProfile = (ImageView)v.findViewById(R.id.iv1);
-
-        handler = new Handler();
-        remainTimePb = (ProgressBar) v.findViewById(R.id.pb);
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() { // Thread 로 작업할 내용을 구현
-                while(true) {
-                    handler.post(new Runnable() {
+    BroadcastReceiver bc = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(ACTION_PASERVICE_POINT_CHANGED)) {
+                if (intent.hasExtra("point")) {
+                    point = intent.getLongExtra("point", 10);
+                    getActivity().runOnUiThread(new Runnable() {
                         @Override
-                        public void run() { // 화면에 변경하는 작업을 구현
-                            remainTimePb.setProgress(remainSec+remainMin*60);
+                        public void run() {
+                            mPointView.setText(Long.toString(point));
+                            //... UI 업데이트 작업
                         }
                     });
-
-                    try {
-                        Thread.sleep(100); // 시간지연
-                    } catch (InterruptedException e) {    }
-                } // end of while
-            }
-        });
-        t.start(); // 쓰레드 시작
-
-        return v;
-
-    }
-
-    private Handler mHandler = new Handler();
-    private Runnable mUpdateTimeTask = new Runnable() {
-        @Override
-        public void run() {
-            curTime = System.currentTimeMillis();
-            long millis = curTime - startTime - pauseTime;
-            int sec = (int)(millis/1000);
-            int hour = sec/3600;
-            int min = (sec%3600)/60;
-            sec = sec%60;
-
-            //remain time
-            remainSec = sec;
-            remainMin = min%20;
-
-            timeStr = String.format("%s:%s:%s",hour,min,sec);
-            remainTimeStr = String.format("%s:%s",remainMin,remainSec);
-            mCulStuTimeView.setText(timeStr);
-            mRemainTimeView.setText(remainTimeStr);
-
-            /*Point policy
-                Every 30 minutes, 1 point increase.
-                Every 20 point (10 hours), user choose LEVEL UP or unlocking app which user want to use.
-            */
-
-            if((min==00)&&(flag==true))
+                    if(point>10)
+                    {
+                        mUnlockBtn.setVisibility(View.VISIBLE);
+                    }
+                }
+            } else if (action.equals(ACTION_PASERVICE_POINTTIME_TICKTING)) {
+                if (intent.hasExtra("time")) {
+                    time = intent.getLongExtra("time", 0);
+                    remainTimePb.setProgress((int)time);
+                    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+                    rt = sdf.format(new Date(time*1000));
+                    culTime += 1;
+                    SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm:ss");
+                    ct = sdf.format(new Date(culTime*1000));
+                    mCulStuTimeView.setText(ct);
+                    mRemainTimeView.setText(rt);
+                }
+            }else if(action.equals(ACTION_PASERVICE_DEACTIVATED))
             {
-                point++;
-                flag=false;
-                mPointView.setText(Integer.toString(point));
-            }else if((min==30)&&(flag==false))
-            {
-                point++;
-                flag=true;
-                mPointView.setText(Integer.toString(point));
+                try
+                {
+                    PAService pa = PAService.Stub.asInterface(ServiceManager.getService("PAService"));
+                    pa.saveUserStateData(culTime,LEVEL);
+                }catch (RemoteException e)
+                {
+
+                }
+                getActivity().finish();
             }
 
-            if(point>=20) {
-                //push alarm
-                //mLevelBtn.setVisibility(View.VISIBLE);
-                //mUnlockBtn.setVisibility(View.VISIBLE);
-            }
         }
     };
-    class MainTimerTask extends TimerTask {
-        public void run(){
-            mHandler.post(mUpdateTimeTask);
-        }
-    }
-
-    public void onDestroy(){
-        mTimer.cancel();
-        super.onDestroy();
-    }
-    public void onPause(){
-        mTimer.cancel();
-        super.onPause();
-    }
-    public void onResume(){
-        super.onResume();
-        MainTimerTask timerTask = new MainTimerTask();
-        mTimer = new Timer();
-        mTimer.schedule(timerTask,500,1000);
-    }
-
-    public void onActivityResult(int requestCode,int resultCode,Intent data)
-    {
-        switch (requestCode)
-        {
-            case 0:
-                point = data.getIntExtra("afterPoint",point);
-                mPointView.setText(Integer.toString(point));
-                restartTime = data.getLongExtra("restartTime",0);
-                pauseTime += restartTime - stopTime;
-                break;
-        }
-    }
-
-
-/*    public void onSaveInstanceState(Bundle savedInstanceState)
-    {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putInt("point",point);
-        savedInstanceState.putInt("LEVEL",LEVEL);
-        savedInstanceState.putLong("pauseTime",pauseTime);
-    }*/
-}
-
-/*
-public class HY_StateDisplay extends Activity {
-
-    TextView mCulStuTimeView;
-    private Timer mTimer;
-    private int culmulTime;
-    private long curTime;
-    private long startTime;
-    String timeStr;
-    //remain time
-    TextView mRemainTimeView;
-    private int remainMin;
-    private int remainSec;
-    String remainTimeStr;
-
-    //point
-    TextView mPointView;
-    private int point;
-    boolean flag;
-    //level
-    TextView mLevelView;
-    Button mLevelBtn;
-    private int LEVEL;
-    //unlock
-    Button mUnlockBtn;
-
-    //stop time
-    private long stopTime;
-    private long restartTime;
-    private long pauseTime;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.state_display);
-        mCulStuTimeView = (TextView) findViewById(R.id.CulStuTimeView);
-        MainTimerTask timerTask = new MainTimerTask();
-        culmulTime = 0;
-        curTime = 0;
-        startTime = System.currentTimeMillis() + 1000;
-        mTimer = new Timer();
-        mTimer.schedule(timerTask, 100, 1000);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View v = inflater.inflate(R.layout.state_display, container, false);
 
-        //remain time setting
-        mRemainTimeView = (TextView) findViewById(R.id.RemaTimeView);
-        remainMin = 20;
-        remainSec = 0;
+        remainTimePb = (ProgressBar) v.findViewById(R.id.pb);
+        remainTimePb.setMax((int)pInterval);
 
-        //
-        point = 100;
-        LEVEL = 1;
-        flag = true;
-        mPointView = (TextView) findViewById(R.id.PointView);
-        mLevelView = (TextView) findViewById(R.id.LevelView);
-        mLevelView.setText(Integer.toString(LEVEL));
-        //
-        mLevelBtn = (Button)findViewById(R.id.LevelBtn);
-        //mLevelBtn.setVisibility(View.INVISIBLE);
+        IntentFilter inf = new IntentFilter();
+        inf.addAction(ACTION_PASERVICE_DEACTIVATED);
+        inf.addAction(ACTION_PASERVICE_POINT_CHANGED);
+        inf.addAction(ACTION_PASERVICE_POINTTIME_TICKTING);
+        getActivity().registerReceiver(bc,inf);
+
+        try {
+            PAService pa = PAService.Stub.asInterface(ServiceManager.getService("PAService"));
+
+            if (pa != null) {
+                long [] LT = pa.getSavedUserStateData();
+                LEVEL = LT[0];
+                culTime = LT[1];
+                pa.setRequiredPointForExecuting(3,1);
+                pa.initPointTimer(pInterval,perPoint);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        time = 0;
+
+        mCulStuTimeView = (TextView) v.findViewById(R.id.CulStuTimeView);
+        mRemainTimeView = (TextView) v.findViewById(R.id.RemaTimeView);
+        mPointView = (TextView) v.findViewById(R.id.PointView);
+        mLevelView = (TextView) v.findViewById(R.id.LevelView);
+        mLevelView.setText(Long.toString(LEVEL));
+        mCulStuTimeView.setText(Long.toString(culTime));
+        mRemainTimeView.setText(Long.toString(time));
+        mLevelBtn = (Button) v.findViewById(R.id.LevelBtn);
         mLevelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(point>=20)
-                {
-                    point-=20;
-                    LEVEL++;
-                    mPointView.setText(Integer.toString(point));
-                    mLevelView.setText(Integer.toString(LEVEL));
-                }
+                    try {
+                        PAService pa = PAService.Stub.asInterface(ServiceManager.getService("PAService"));
+                        if (pa.modifyPointData(-20)) {
+                            LEVEL++;
+                            mPointView.setText(Long.toString(point));
+                            mLevelView.setText(Long.toString(LEVEL));
+                        }
+                    }catch (RemoteException e) {
+                    }
             }
         });
-        mUnlockBtn = (Button)findViewById(R.id.UnlockBtn);
-        //mUnlockBtn.setVisibility(View.INVISIBLE);
-        mUnlockBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(point>=20) {
-                    //point -= 20;
-                    mPointView.setText(Integer.toString(point));
-                    Intent intent = new Intent(getApplicationContext(), AppsManager.class);
-                    intent.putExtra("point",point);
-                    stopTime = curTime;
-                    startActivityForResult(intent,0);
-                    //finish();
+        mUnlockBtn = (Button) v.findViewById(R.id.UnlockBtn);
+        mUnlockBtn.setVisibility(View.INVISIBLE);
+            mUnlockBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getActivity(), AppsManager.class);
+                    startActivity(intent);
                 }
-            }
-        });
+            });
 
-        stopTime = 0;
-        restartTime = 0;
-        pauseTime = 0;
-
+        mProfile = (ImageView) v.findViewById(R.id.iv1);
+        return v;
     }
 
-    private Handler mHandler = new Handler();
-    private Runnable mUpdateTimeTask = new Runnable() {
-        @Override
-        public void run() {
-            curTime = System.currentTimeMillis();
-            long millis = curTime - startTime - pauseTime;
-            int sec = (int)(millis/1000);
-            int hour = sec/3600;
-            int min = (sec%3600)/60;
-            sec = sec%60;
-
-            //remain time
-            remainSec = 60 - sec;
-            remainMin = 29 - min%20;
-
-            timeStr = String.format("%s:%s:%s",hour,min,sec);
-            remainTimeStr = String.format("%s:%s",remainMin,remainSec);
-            mCulStuTimeView.setText(timeStr);
-            mRemainTimeView.setText(remainTimeStr);
-            */
-/*Point policy
-                Every 30 minutes, 1 point increase.
-                Every 20 point (10 hours), user choose LEVEL UP or unlocking app which user want to use.
-            *//*
-
-            if((min==00)&&(flag==true))
-            {
-                point++;
-                flag=false;
-                mPointView.setText(Integer.toString(point));
-            }else if((min==30)&&(flag==false))
-            {
-                point++;
-                flag=true;
-                mPointView.setText(Integer.toString(point));
-            }
-
-            if(point>=20) {
-                //push alarm
-                //mLevelBtn.setVisibility(View.VISIBLE);
-                //mUnlockBtn.setVisibility(View.VISIBLE);
-            }
-        }
-    };
-    class MainTimerTask extends TimerTask {
-        public void run(){
-            mHandler.post(mUpdateTimeTask);
-        }
-    }
-
-    protected void onDestroy(){
-        mTimer.cancel();
+    public void onDestroy() {
         super.onDestroy();
     }
-    protected void onPause(){
-        mTimer.cancel();
+
+    public void onPause() {
         super.onPause();
     }
-    protected void onResume(){
-        MainTimerTask timerTask = new MainTimerTask();
-        mTimer = new Timer();
-        mTimer.schedule(timerTask,500,1000);
+
+    public void onResume() {
         super.onResume();
     }
-
-    protected void onActivityResult(int requestCode,int resultCode,Intent data)
-    {
-        switch (requestCode)
-        {
-            case 0:
-                point = data.getIntExtra("afterPoint",point);
-                mPointView.setText(Integer.toString(point));
-                restartTime = data.getLongExtra("restartTime",0);
-                pauseTime += restartTime - stopTime;
-                break;
-        }
-    }
 }
-*/

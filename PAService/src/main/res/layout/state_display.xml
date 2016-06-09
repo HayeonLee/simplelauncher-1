@@ -118,7 +118,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/PointView"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Points"
+            android:text="0"
             android:gravity="left"
             android:layout_marginLeft="8dp"
             android:textSize="30dp"

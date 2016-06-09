@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
+
 public class HomeScreen extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -32,6 +33,10 @@ public class HomeScreen extends AppCompatActivity
     FragmentTransaction transaction;
     FragmentManager FM;
 
+    private static final String ACTION_PASERVICE_ACTIVATED ="PA_SERVICE_ACTIVATED";
+    private static final String ACTION_PASERVICE_DEACTIVATED ="PA_SERVICE_DEACTIVATED";
+    private static final String ACTION_PASERVICE_POINT_CHANGED ="PA_SERVICE_POINT_CHANGED";
+    private static final String ACTION_PASERVICE_POINTTIME_TICKTING ="PA_SERVICE_POINTTIME_TICKTING";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,36 +64,23 @@ public class HomeScreen extends AppCompatActivity
         transaction.hide(ListFrag);
 
         transaction.commit();
-/*        Fragment fragment = new HY_StateDisplay();
-        FragmentManager manager = getSupportFragmentManager();
-        manager.beginTransaction()
-                .replace(R.id.main_frame, fragment)
-                .commit();*/
+
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
-/*        StateFrag = new HY_StateDisplay();
-        ListFrag = new AppsGridFragment();
-        FM = getSupportFragmentManager();
-        transaction = FM.beginTransaction();
-        transaction.add(R.id.main_frame,StateFrag,"state");
-        transaction.add(R.id.main_frame,ListFrag,"list");
-        transaction.replace(R.id.main_frame,StateFrag);
-        transaction.commit();
-        Fragment fragment = new HY_StateDisplay();
-        FragmentManager manager = getSupportFragmentManager();
-        manager.beginTransaction()
-                .replace(R.id.main_frame, fragment)
-                .commit();*/
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 
     @Override
@@ -121,86 +113,7 @@ public class HomeScreen extends AppCompatActivity
         drawerLayout.closeDrawers();
         menuItem.setChecked(true);
 
-/*        if (fragment != null) {
-            FragmentManager manager = getSupportFragmentManager();
-            manager.beginTransaction()
-                    .replace(R.id.main_frame, fragment)
-                    .commit();
-
-            drawerLayout.closeDrawers();
-            menuItem.setChecked(true);
-        }*/
-
         return true;
     }
 
 }
-
-/*import android.os.Bundle;
-import android.app.Activity;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.view.Menu;
-import android.view.View;
-import android.widget.Button;
-
-public class HomeScreen extends FragmentActivity implements View.OnClickListener {
-    //public class HomeScreen extends FragmentActivity  {
-
-    Fragment StateFrag = null;
-    Fragment ListFrag = null;
-    FragmentTransaction transaction;
-    FragmentManager FM;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.homescreen);
-
-        Button bt_oneFrag = (Button)findViewById(R.id.bt_oneFrag);
-        bt_oneFrag.setOnClickListener(this);
-        Button bt_twoFrag = (Button)findViewById(R.id.bt_twoFrag);
-        bt_twoFrag.setOnClickListener(this);
-
-        StateFrag = new HY_StateDisplay();
-        ListFrag = new AppsGridFragment();
-        FM = getSupportFragmentManager();
-        transaction = FM.beginTransaction();
-        transaction.add(R.id.mainFrag,StateFrag,"state");
-        transaction.add(R.id.mainFrag,ListFrag,"list");
-        transaction = FM.beginTransaction();
-        transaction.replace(R.id.mainFrag,StateFrag);
-        transaction.commit();
-        transaction.commit();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.home_screen, menu);
-        return true;
-    }
-
-    @Override
-    public void onClick(View view) {
-
-        transaction = FM.beginTransaction();
-
-        switch (view.getId()){
-            case R.id.bt_oneFrag:
-                transaction.hide(ListFrag);
-                transaction.show(StateFrag);
-                break;
-            case R.id.bt_twoFrag:
-                transaction.hide(StateFrag);
-                transaction.show(ListFrag);
-                //transaction.replace(R.id.mainFrag,ListFrag);
-                break;
-            default:
-                break;
-        }
-        transaction.commit();
-    }
-}*/
