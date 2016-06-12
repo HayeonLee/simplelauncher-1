@@ -210,34 +210,6 @@ public class HY_StateDisplay extends Fragment {
         super.onResume();
     }
 
-    public void changeBackground(long LEVEL)
-    {
 
-        int c = (int)LEVEL%8;
-        switch (c)
-        {
-            case 0 :
-                mylayout.setBackgroundResource(R.drawable.a);
-                break;
-            case 1:
-                mylayout.setBackgroundResource(R.drawable.b);
-                break;
-            case 2:
-                mylayout.setBackgroundResource(R.drawable.c);
-                break;
-            case 3:
-                mylayout.setBackgroundResource(R.drawable.d);
-                break;
-            case 4:
-                mylayout.setBackgroundResource(R.drawable.e);
-                break;
-            case 5:
-                mylayout.setBackgroundResource(R.drawable.f);
-                break;
-            default:
-                mylayout.setBackgroundResource(R.drawable.g);
-                break;
-        }
-    }
 
 }

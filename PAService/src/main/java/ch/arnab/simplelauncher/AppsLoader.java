@@ -48,7 +48,7 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
     @Override
     public ArrayList<AppModel> loadInBackground() {
         // retrieve the ArrayList of installed applications
-        List<ApplicationInfo> apps = mPm.getInstalledApplications(0);
+        List<ApplicationInfo> apps = mPm.getInstalledApplications(-1);
 
         try{
 

@@ -40,7 +40,7 @@ public class AppsManager extends Activity {
         super.onCreate(savedInstanceState);
         final Intent mainIntent = new Intent(Intent.ACTION_MAIN,null);
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-
+	mainIntent.putExtra("paservice","0xdeaddead");
         pm = getPackageManager();
         List<ResolveInfo> tapps = pm.queryIntentActivities(mainIntent,0);
 
